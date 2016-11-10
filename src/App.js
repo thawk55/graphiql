@@ -42,6 +42,9 @@ class App extends Component {
     }).then(response => response.json());
     return (
       <GraphiQL fetcher={fetcher}>
+        <GraphiQL.Logo>
+          <img src="/logo.png" alt="Divvy Logo" style={{width: '30px'}} />
+        </GraphiQL.Logo>
         <GraphiQL.Toolbar>
           <div>
             <span style={{margin: '5px'}}>
