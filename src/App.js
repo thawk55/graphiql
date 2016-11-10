@@ -44,15 +44,16 @@ class App extends Component {
       <GraphiQL fetcher={fetcher}>
         <GraphiQL.Toolbar>
           <div>
-            <span>
+            <span style={{margin: '5px'}}>
               <label htmlFor="backend">Backend: </label>
               <select defaultValue={URLS.staging} onChange={this.setFetchUrl}>
                 <option value={URLS.staging}>Staging</option>
                 <option value={URLS.dev}>Dev</option>
               </select>
             </span>
-            <span>
-              <label htmlFor="backend" onClick={this.toggleToken}>Bearer Token</label>
+            <span style={{margin: '5px'}}>
+              <label htmlFor="backend">Bearer Token</label>
+              <span style={{margin: '5px', fontSize: '10px'}} id="toggle-token" onClick={this.toggleToken}>Show/Hide</span>
               {this.state.showToken ?
                 <input type="text" placeholder="Token" onChange={this.setBearerToken} />
               :
