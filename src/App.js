@@ -8,10 +8,6 @@ const URLS = {
 }
 
 class DivvyGraphiQL extends GraphiQL {
-  constructor(props, context) {
-    super(props, context);
-  }
-
   handleToggleDocs = () => {
     if (!this.state.docExplorerOpen) {
       this._ensureOfSchema();
