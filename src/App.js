@@ -55,6 +55,14 @@ class App extends Component {
       },
       body: JSON.stringify(params),
     }).then(response => response.json());
+
+    const iconSize = {height: '12px', width:'12px'};
+    let tokenIcon;
+    if (this.state.showToken) {
+      tokenIcon = <img src="/checkmark.png" alt="Hide Token" style={iconSize} />
+    } else {
+      tokenIcon = <img src="/edit.png" alt="Edit Token" style={iconSize} />
+    }
     return (
       <DivvyGraphiQL fetcher={fetcher}>
         <GraphiQL.Logo>
@@ -71,7 +79,7 @@ class App extends Component {
             </span>
             <span style={{margin: '5px'}}>
               <label htmlFor="backend">Bearer Token</label>
-              <span style={{margin: '5px', fontSize: '10px'}} id="toggle-token" onClick={this.toggleToken}>Show/Hide</span>
+              <span style={{margin: '5px', fontSize: '10px'}} id="toggle-token" onClick={this.toggleToken}>{tokenIcon}</span>
               {this.state.showToken ?
                 <input type="text" placeholder="Token" value={this.state.bearerToken} onChange={this.setBearerToken} />
               :
