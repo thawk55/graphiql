@@ -7,6 +7,22 @@ const URLS = {
   dev: "https://backend-dev.divvypay.com/graphql",
 }
 
+class DivvyGraphiQL extends GraphiQL {
+  constructor(props, context) {
+    super(props, context);
+  }
+
+  handleToggleDocs = () => {
+    if (!this.state.docExplorerOpen) {
+      this._ensureOfSchema();
+    }
+    if (typeof this.props.onToggleDocs === 'function') {
+      this.props.onToggleDocs(!this.state.docExplorerOpen);
+    }
+    this.setState({ docExplorerOpen: !this.state.docExplorerOpen });
+  }
+}
+
 class App extends Component {
   bearerToken = "";
   fetchUrl = URLS.staging;
@@ -41,7 +57,7 @@ class App extends Component {
       body: JSON.stringify(params),
     }).then(response => response.json());
     return (
-      <GraphiQL fetcher={fetcher}>
+      <DivvyGraphiQL fetcher={fetcher}>
         <GraphiQL.Logo>
           <img src="/logo.png" alt="Divvy Logo" style={{width: '30px'}} />
         </GraphiQL.Logo>
@@ -65,7 +81,7 @@ class App extends Component {
             </span>
           </div>
         </GraphiQL.Toolbar>
-      </GraphiQL>
+      </DivvyGraphiQL>
     )
   }
 }
