@@ -24,19 +24,18 @@ class DivvyGraphiQL extends GraphiQL {
 }
 
 class App extends Component {
-  bearerToken = "";
   fetchUrl = URLS.staging;
 
   constructor(props, context) {
     super(props, context);
-    this.state = { showToken: false };
+    this.state = { showToken: false, bearerToken: "" };
     this.setBearerToken = this.setBearerToken.bind(this);
     this.setFetchUrl = this.setFetchUrl.bind(this);
     this.toggleToken = this.toggleToken.bind(this);
   }
 
   setBearerToken(event) {
-    this.bearerToken = event.nativeEvent.target.value;
+    this.setState({bearerToken: event.nativeEvent.target.value});
   }
 
   setFetchUrl(event) {
@@ -52,7 +51,7 @@ class App extends Component {
       method: 'post',
       headers: {
         'Content-Type': "application/json",
-        'Authorization': `BEARER ${this.bearerToken}`,
+        'Authorization': `BEARER ${this.state.bearerToken}`,
       },
       body: JSON.stringify(params),
     }).then(response => response.json());
@@ -74,7 +73,7 @@ class App extends Component {
               <label htmlFor="backend">Bearer Token</label>
               <span style={{margin: '5px', fontSize: '10px'}} id="toggle-token" onClick={this.toggleToken}>Show/Hide</span>
               {this.state.showToken ?
-                <input type="text" placeholder="Token" onChange={this.setBearerToken} />
+                <input type="text" placeholder="Token" value={this.state.bearerToken} onChange={this.setBearerToken} />
               :
                 null
               }
