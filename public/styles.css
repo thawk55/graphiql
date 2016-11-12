@@ -1,3 +1,102 @@
-.toolbar > div {
-  height: 22px;
+.toolbar {
+  display: flex;
+  width: 100%;
+  overflow: hidden;
+  align-items: center;
+}
+.toolbar label {
+  margin: 0 7px 0 22px;
+  line-height: 26px;
+  height: 26px;
+}
+
+.toolbar #backend {
+  margin-right: 4px;
+}
+
+.toolbar a {
+}
+
+.toolbar select {
+  font-size: 14px;
+  color: #444;
+  height: 26px;
+}
+
+.toolbar img {
+  opacity: 0.5;
+  border: 1px solid transparent;
+  height: 24px;
+  width: 24px;
+  padding: 3px;
+  margin: 0 0 0 2px;
+  border-radius: 3px;
+  box-sizing: border-box;
+  vertical-align: middle;
+}
+.toolbar img:hover {
+  border: 1px solid #aaa;
+  opacity: 0.8;
+  cursor: pointer;
+}
+#settings-icon {
+  margin-left: 12px;
+}
+#settings-icon.active {
+  opacity: 1;
+}
+.toolbar input[type="text"] {
+  width: 100px;
+  font-size: 10px;
+  margin: 0 2px;
+}
+
+.settings {
+  overflow: visible;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+}
+
+.toolbar-right {
+  width: 100%;
+  text-align: right;
+  white-space: nowrap;
+}
+
+#backend-modal h4 {
+  color: #777;
+  margin: 0 0 12px 0;
+}
+
+#backend-modal label {
+  font-size: 12px;
+  color: #888;
+  padding: 3px 2px;
+  display: block;
+}
+#backend-modal input[type="text"] {
+  margin-bottom: 12px;
+  font-size: 14px;
+  line-height: 22px;
+  padding: 2px 4px;
+  width: 100%;
+  box-sizing: border-box;
+}
+#backend-modal input[type="submit"] {
+  font-size: 14px;
+  border: 1px solid #ccc;
+  background: #eee;
+  cursor: pointer;
+  border-radius: 2px;
+  padding: 8px 16px;
+  color: #444;
+  margin: 12px 8px 0 0;
+}
+#backend-modal input[type="submit"]:hover {
+  border: 1px solid #888;
+  color: #222;
+}
+#backend-modal input[type="submit"][value="Cancel"] {
+  margin-right: 20px;
 }

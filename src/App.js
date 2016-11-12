@@ -1,6 +1,5 @@
 import GraphiQL from 'graphiql';
-import isEmpty from 'lodash/isEmpty';
-import map from 'lodash/map';
+import _ from 'lodash';
 import React, { Component } from 'react';
 import { Modal } from 'react-overlays';
 import 'whatwg-fetch';
@@ -8,31 +7,7 @@ import 'whatwg-fetch';
 const URLS = [
   { name: "Staging", url: "https://backend-staging.divvypay.com/graphql" },
   { name: "Dev", url: "https://backend-dev.divvypay.com/graphql" },
-]
-
-const modalStyle = {
-  position: 'fixed',
-  zIndex: 1040,
-  top: 0, bottom: 0, left: 0, right: 0,
-};
-
-const backdropStyle = {
-  ...modalStyle,
-  zIndex: 'auto',
-  backgroundColor: '#000',
-  opacity: 0.5,
-};
-
-const dialogStyle = {
-  position: 'absolute',
-  width: 300,
-  top: '50%', left: '50%',
-  transform: `translate(-50%, -50%)`,
-  border: '1px solid #e5e5e5',
-  backgroundColor: 'white',
-  boxShadow: '0 5px 15px rgba(0,0,0,.5)',
-  padding: 20,
-};
+];
 
 class DivvyGraphiQL extends GraphiQL {
   handleToggleDocs = () => {
@@ -46,59 +21,219 @@ class DivvyGraphiQL extends GraphiQL {
   }
 }
 
+const getLocalStorageUrls = () => {
+  let urls = [];
+  try {
+    urls = JSON.parse(localStorage.getItem('graphiql:urls') || "[]");
+  } catch (e) {
+    console.error(e);
+  }
+  return urls;
+};
+
+const setLocalStorageUrls = (urls) => {
+  localStorage.setItem('graphiql:urls', JSON.stringify(urls || []));
+};
+
+const getLocalStorageCurrentUrlName = () => {
+  return localStorage.getItem('graphiql:currentUrlName');
+};
+
+const setLocalStorageCurrentUrlName = (name) => {
+  localStorage.setItem('graphiql:currentUrlName', name);
+};
+
+
+class UrlEditDialog extends React.Component {
+  static propTypes = {
+    action: React.PropTypes.oneOfType([React.PropTypes.bool, React.PropTypes.string]),
+    currentUrl: React.PropTypes.object,
+    onHide: React.PropTypes.func,
+    onAdd: React.PropTypes.func,
+    onEdit: React.PropTypes.func,
+    onDelete: React.PropTypes.func,
+  };
+
+  onSave = () => {
+    const { action, onAdd, onEdit } = this.props;
+    const url = {
+      name: this.refs.backendName.value,
+      url: this.refs.backendUrl.value,
+      bearerToken: this.refs.bearerToken.value,
+    };
+    if (url.name && url.url) {
+      if (action === 'add') {
+        onAdd(url);
+      } else {
+        onEdit(url);
+      }
+    }
+  };
+
+  onDelete = () => {
+    this.props.onDelete(this.props.currentUrl);
+  };
+
+  confirmDelete = () => {
+    if (confirm('Delete this backend configuration?')) {
+      this.onDelete();
+    }
+  };
+
+  render() {
+    const modalStyle = {
+      position: 'fixed',
+      zIndex: 1040,
+      top: 0, bottom: 0, left: 0, right: 0,
+    };
+
+    const styles = {
+      modal: modalStyle,
+      backdrop: {
+        ...modalStyle,
+        zIndex: 'auto',
+        backgroundColor: '#000',
+        opacity: 0.5,
+      },
+      dialog: {
+        position: 'absolute',
+        width: '80%',
+        maxWidth: 500,
+        top: '100px', left: '50%',
+        transform: 'translate(-50%, 0)',
+        border: '1px solid #e5e5e5',
+        backgroundColor: 'white',
+        boxShadow: '0 5px 15px rgba(0,0,0,.5)',
+        padding: 20,
+      },
+    };
+
+    const { action, onHide, currentUrl } = this.props;
+    const adding = action === 'add';
+    const url = adding ? { name: '', url: '' } : currentUrl;
+
+    return (
+      <Modal style={styles.modal} backdropStyle={styles.backdrop} show={!!action} onHide={onHide}>
+        <div id="backend-modal" style={styles.dialog}>
+          <h4>{`${adding ? 'New ' : ''} Backend Settings`}</h4>
+          <div>
+            <label htmlFor="backend-name">Name</label>
+            <input
+              type="text"
+              id="backend-name"
+              ref="backendName"
+              defaultValue={url.name}
+            />
+          </div>
+          <div>
+            <label htmlFor="backend-url">URL</label>
+            <input
+              type="text"
+              id="backend-url"
+              placeholder="https://{{host}/graphiql"
+              ref="backendUrl"
+              defaultValue={url.url}
+            />
+          </div>
+          <div>
+            <label htmlFor="backend-token">Bearer Token</label>
+            <input
+              type="text"
+              id="backend-token"
+              ref="bearerToken"
+              defaultValue={url.bearerToken}
+            />
+          </div>
+          <input type="submit" onClick={this.onSave} value="Save" />
+          <input type="submit" onClick={onHide} value="Cancel" />
+          <input type="submit" onClick={this.confirmDelete} value="Delete" />
+        </div>
+      </Modal>
+    );
+  }
+}
+
 class App extends Component {
   constructor(props, context) {
     super(props, context);
-    this.setBearerToken = this.setBearerToken.bind(this);
-    this.setFetchUrl = this.setFetchUrl.bind(this);
-    this.toggleToken = this.toggleToken.bind(this);
+
+    let urls = getLocalStorageUrls();
+    urls = _.size(urls) > 0 ? urls : URLS;
+    const currentUrl = _.find(urls, {name: getLocalStorageCurrentUrlName()}) || urls[0];
+
     this.state = {
       showToken: false,
-      bearerToken: "",
-      urls: URLS,
-      currentUrl: URLS[0].url,
+      urls,
+      currentUrl,
       showBackendModal: false,
     };
   }
 
-  setBearerToken(event) {
-    this.setState({bearerToken: event.nativeEvent.target.value});
+  setFetchUrl = (event) => {
+    const currentUrl = _.find(this.state.urls, {name: event.target.value});
+    setLocalStorageCurrentUrlName(currentUrl.name);
+    this.setState({ currentUrl });
   }
 
-  setFetchUrl(event) {
-    this.setState({ currentUrl: event.nativeEvent.target.value });
-  }
-
-  toggleToken() {
-    this.setState({ showToken: !this.state.showToken });
-  }
-
-  showBackendModal = () => {
-    this.setState({ showBackendModal: true })
+  showBackendModal = (event) => {
+    const action = event.target.dataset['action'];
+    this.setState({ showBackendModal: action });
   }
 
   closeBackendModal = () => {
     this.setState({ showBackendModal: false })
   }
 
-  addBackendUrl = () => {
-    const name = this.refs.backendName.value;
-    const url = this.refs.backendUrl.value;
-    if (!isEmpty(name) && !isEmpty(url)) {
-      this.setState({
-        urls: [...this.state.urls, { name, url }],
-        currentUrl: url,
-        showBackendModal: false,
-      })
-    }
+  addBackendUrl = (url) => {
+    const urls = [...this.state.urls, url];
+    setLocalStorageUrls(urls);
+    setLocalStorageCurrentUrlName(url.name);
+    this.setState({
+      urls: urls,
+      currentUrl: url,
+      showBackendModal: false,
+    });
   }
 
+  editBackendUrl = (url) => {
+    const urls = this.state.urls;
+    let currentUrl = _.find(this.state.urls, this.state.currentUrl);
+    _.assign(currentUrl, url);
+    setLocalStorageUrls(urls);
+    setLocalStorageCurrentUrlName(currentUrl.name);
+    this.setState({
+      showBackendModal: false,
+      urls,
+      currentUrl,
+    });
+  }
+
+  deleteBackendUrl = (url) => {
+    let urls = _.filter(this.state.urls, (_url) => _url !== url);
+    if (_.size(urls) === 0) {
+      urls = URLS;
+    }
+    const currentUrl = urls[0];
+    this.setState({
+      showBackendModal: false,
+      urls,
+      currentUrl,
+    });
+  }
+
+  authHeaders = () => {
+    const headers = {};
+    const bearerToken = _.get(this, 'state.currentUrl.bearerToken');
+    if (bearerToken) {
+      headers['Authorization'] = `BEARER ${bearerToken}`;
+    }
+    return headers;
+  };
+
   downloadSchema = () => {
-    fetch(`${this.state.currentUrl}/schema`, {
+    fetch(`${this.state.currentUrl.url}/schema`, {
       method: 'get',
-      headers: {
-        'Authorization': `BEARER ${this.state.bearerToken}`,
-      },
+      headers: {...this.authHeaders()},
     }).then(response => {
       if (response.ok) {
         response.text().then(schema => {
@@ -117,75 +252,54 @@ class App extends Component {
           }
         });
       } else {
-        console.log(`Download failed with status code ${response.status}`);
+        console.error(`Download failed with status code ${response.status}`);
       }
     });
   }
 
   render() {
-    const fetcher = params => fetch(this.state.currentUrl, {
+    const styles = {
+      label: {
+        marginLeft: '12px',
+      }
+    };
+
+    const fetcher = (params) => fetch(this.state.currentUrl.url, {
       method: 'post',
       headers: {
         'Content-Type': "application/json",
-        'Authorization': `BEARER ${this.state.bearerToken}`,
+        ...this.authHeaders(),
       },
       body: JSON.stringify(params),
     }).then(response => response.json());
 
-    const iconSize = {height: '12px', width:'12px'};
-    let tokenIcon;
-    if (this.state.showToken) {
-      tokenIcon = <img src="/checkmark.png" alt="Hide Token" style={iconSize} />
-    } else {
-      tokenIcon = <img src="/edit.png" alt="Edit Token" style={iconSize} />
-    }
     return (
       <DivvyGraphiQL fetcher={fetcher}>
         <GraphiQL.Logo>
           <img src="/logo.png" alt="Divvy Logo" style={{width: '30px'}} />
         </GraphiQL.Logo>
         <GraphiQL.Toolbar>
-          <div>
-            <span style={{margin: '5px'}}>
-              <label htmlFor="backend">Backend: </label>
-              <select value={this.state.currentUrl} onChange={this.setFetchUrl}>
-                {map(this.state.urls, (backend, idx) => (
-                  <option key={backend.name + idx} value={backend.url}>{backend.name}</option>
-                ))}
-              </select>
-            </span>
-            <span>
-              <img src="/plus.png" alt="Add Backend URL" style={iconSize} onClick={this.showBackendModal} />
-            </span>
-            <span style={{margin: '5px'}}>
-              <label htmlFor="backend">Bearer Token</label>
-              <span style={{margin: '5px', fontSize: '10px'}} id="toggle-token" onClick={this.toggleToken}>{tokenIcon}</span>
-              {this.state.showToken ?
-                <input type="text" placeholder="Token" value={this.state.bearerToken} onChange={this.setBearerToken} />
-              :
-                null
-              }
-            </span>
-            <button onClick={this.downloadSchema}>Download Schema</button>
-            <Modal style={modalStyle} backdropStyle={backdropStyle} show={this.state.showBackendModal} onHide={this.closeBackendModal}>
-              <div style={dialogStyle}>
-                <h4>Add Backend URL</h4>
-                <div style={{height: '35px'}}>
-                  <div style={{float: 'left', width: '70px', height: '30px'}}><label htmlFor="name">Name:</label></div>
-                  <div style={{float: 'left', height: '30px', padding: '0', margin: '0'}}>
-                    <input type="text" name="name" ref="backendName" style={{padding: '0'}} />
-                  </div>
-                </div>
-                <div style={{height: '35px'}}>
-                  <div style={{float: 'left', width: '70px', height: '30px'}}><label htmlFor="url">Url:</label></div>
-                  <div style={{float: 'left', height: '30px', padding: '0', margin: '0'}}>
-                    <input type="text" name="url" ref="backendUrl"/>
-                  </div>
-                </div>
-                <button onClick={this.addBackendUrl}>Save</button>
-              </div>
-            </Modal>
+          <div className="settings">
+            <label htmlFor="backend">Backend</label>
+            <select id="backend" value={this.state.currentUrl.name} onChange={this.setFetchUrl}>
+              {_.map(this.state.urls, (backend, idx) => (
+                <option key={backend.name + idx} value={backend.name}>{backend.name}</option>
+              ))}
+            </select>
+            <img src="/edit.png" alt="Edit Backend URL" data-action="edit" style={styles.icon} onClick={this.showBackendModal} />
+            <img src="/plus.png" alt="Add Backend URL" data-action="add" style={styles.icon} onClick={this.showBackendModal} />
           </div>
+          <div className="toolbar-right">
+            <a className="toolbar-button" onClick={this.downloadSchema}>Download Schema</a>
+          </div>
+          <UrlEditDialog
+            action={this.state.showBackendModal}
+            onHide={this.closeBackendModal}
+            onAdd={this.addBackendUrl}
+            onEdit={this.editBackendUrl}
+            onDelete={this.deleteBackendUrl}
+            currentUrl={this.state.currentUrl}
+          />
         </GraphiQL.Toolbar>
       </DivvyGraphiQL>
     )
