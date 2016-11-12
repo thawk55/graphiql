@@ -82,7 +82,6 @@ class App extends Component {
   }
 
   addBackendUrl = () => {
-    console.log(this.refs.backendName);
     const name = this.refs.backendName.value;
     const url = this.refs.backendUrl.value;
     if (!isEmpty(name) && !isEmpty(url)) {
@@ -92,6 +91,35 @@ class App extends Component {
         showBackendModal: false,
       })
     }
+  }
+
+  downloadSchema = () => {
+    fetch(`${this.state.currentUrl}/schema`, {
+      method: 'get',
+      headers: {
+        'Authorization': `BEARER ${this.state.bearerToken}`,
+      },
+    }).then(response => {
+      if (response.ok) {
+        response.text().then(schema => {
+          const downloadUri = `data:application/json,${encodeURIComponent(schema)}`;
+          const downloadLink = document.createElement('a');
+          downloadLink.setAttribute('href', downloadUri);
+          downloadLink.setAttribute('download', 'schema.json');
+
+          if (document.createEvent) {
+            const event = document.createEvent('MouseEvents');
+            event.initEvent('click', true, true);
+            downloadLink.dispatchEvent(event);
+          }
+          else {
+            downloadLink.click();
+          }
+        });
+      } else {
+        console.log(`Download failed with status code ${response.status}`);
+      }
+    });
   }
 
   render() {
@@ -138,6 +166,7 @@ class App extends Component {
                 null
               }
             </span>
+            <button onClick={this.downloadSchema}>Download Schema</button>
             <Modal style={modalStyle} backdropStyle={backdropStyle} show={this.state.showBackendModal} onHide={this.closeBackendModal}>
               <div style={dialogStyle}>
                 <h4>Add Backend URL</h4>
