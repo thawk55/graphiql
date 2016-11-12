@@ -258,12 +258,6 @@ class App extends Component {
   }
 
   render() {
-    const styles = {
-      label: {
-        marginLeft: '12px',
-      }
-    };
-
     const fetcher = (params) => fetch(this.state.currentUrl.url, {
       method: 'post',
       headers: {
@@ -286,8 +280,8 @@ class App extends Component {
                 <option key={backend.name + idx} value={backend.name}>{backend.name}</option>
               ))}
             </select>
-            <img src="/edit.png" alt="Edit Backend URL" data-action="edit" style={styles.icon} onClick={this.showBackendModal} />
-            <img src="/plus.png" alt="Add Backend URL" data-action="add" style={styles.icon} onClick={this.showBackendModal} />
+            <img src="/edit.png" alt="Edit Backend URL" data-action="edit" onClick={this.showBackendModal} />
+            <img src="/plus.png" alt="Add Backend URL" data-action="add" onClick={this.showBackendModal} />
           </div>
           <div className="toolbar-right">
             <a className="toolbar-button" onClick={this.downloadSchema}>Download Schema</a>
