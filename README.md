@@ -7,10 +7,9 @@ backend and specify a bearer token to use.
 
 To run:
 * `npm install`
-* `npm start`
+* `npm start` or `PORT=<port> npm start`
 
-This should open up [localhost:3000](http://localhost:3000) in a browser
-tab and you are good to go.
+This should open the app in a browser tab. The default port is 3000.
 
 ## Developing
 
