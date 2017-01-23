@@ -28,6 +28,14 @@ const getLocalStorageUrls = () => {
   } catch (e) {
     console.error(e);
   }
+
+  _.each(urls, (url) => {
+    if (!url.authHeader && !url.authValue && url.bearerToken) {
+      url.authHeader = 'Authorization';
+      url.authValue = `BEARER ${url.bearerToken}`;
+      delete url.bearerToken;
+    }
+  });
   return urls;
 };
 
@@ -59,7 +67,8 @@ class UrlEditDialog extends React.Component {
     const url = {
       name: this.refs.backendName.value,
       url: this.refs.backendUrl.value,
-      bearerToken: this.refs.bearerToken.value,
+      authHeader: this.refs.authHeader.value,
+      authValue: this.refs.authValue.value,
     };
     if (url.name && url.url) {
       if (action === 'add') {
@@ -110,7 +119,7 @@ class UrlEditDialog extends React.Component {
 
     const { action, onHide, currentUrl } = this.props;
     const adding = action === 'add';
-    const url = adding ? { name: '', url: '' } : currentUrl;
+    const url = adding ? { name: '', url: 'https://{host}/graphql', authHeader: 'Authorization', authValue: 'BEARER <token>' } : currentUrl;
 
     return (
       <Modal style={styles.modal} backdropStyle={styles.backdrop} show={!!action} onHide={onHide}>
@@ -130,18 +139,26 @@ class UrlEditDialog extends React.Component {
             <input
               type="text"
               id="backend-url"
-              placeholder="https://{{host}/graphiql"
+              placeholder="https://{{host}/graphql"
               ref="backendUrl"
               defaultValue={url.url}
             />
           </div>
           <div>
-            <label htmlFor="backend-token">Bearer Token</label>
+            <label htmlFor="auth-header">Auth Header</label>
             <input
               type="text"
-              id="backend-token"
-              ref="bearerToken"
-              defaultValue={url.bearerToken}
+              id="auth-header"
+              ref="authHeader"
+              defaultValue={url.authHeader}
+            />
+            <label htmlFor="auth-value">Auth Value</label>
+            <input
+              type="text"
+              id="auth-value"
+              ref="authValue"
+              defaultValue={url.authValue}
+              placeholder="BEARER <token>"
             />
           </div>
           <input type="submit" onClick={this.onSave} value="Save" />
@@ -223,9 +240,10 @@ class App extends Component {
 
   authHeaders = () => {
     const headers = {};
-    const bearerToken = _.get(this, 'state.currentUrl.bearerToken');
-    if (bearerToken) {
-      headers['Authorization'] = `BEARER ${bearerToken}`;
+    let authHeader = _.get(this, 'state.currentUrl.authHeader');
+    let authValue = _.get(this, 'state.currentUrl.authValue');
+    if (authHeader) {
+      headers[authHeader] = authValue;
     }
     return headers;
   };
