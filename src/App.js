@@ -5,6 +5,7 @@ import { Modal } from 'react-overlays';
 import 'whatwg-fetch';
 
 const URLS = [
+  { name: "", url: "" },
 ];
 
 class DivvyGraphiQL extends GraphiQL {
