@@ -10,7 +10,7 @@
   height: 26px;
 }
 
-.toolbar #backend {
+.toolbar #endpoint {
   margin-right: 4px;
 }
 
@@ -64,18 +64,18 @@
   white-space: nowrap;
 }
 
-#backend-modal h4 {
+#endpoint-modal h4 {
   color: #777;
   margin: 0 0 12px 0;
 }
 
-#backend-modal label {
+#endpoint-modal label {
   font-size: 12px;
   color: #888;
   padding: 3px 2px;
   display: block;
 }
-#backend-modal input[type="text"] {
+#endpoint-modal input[type="text"] {
   margin-bottom: 12px;
   font-size: 14px;
   line-height: 22px;
@@ -83,7 +83,7 @@
   width: 100%;
   box-sizing: border-box;
 }
-#backend-modal input[type="submit"] {
+#endpoint-modal input[type="submit"] {
   font-size: 14px;
   border: 1px solid #ccc;
   background: #eee;
@@ -93,10 +93,10 @@
   color: #444;
   margin: 12px 8px 0 0;
 }
-#backend-modal input[type="submit"]:hover {
+#endpoint-modal input[type="submit"]:hover {
   border: 1px solid #888;
   color: #222;
 }
-#backend-modal input[type="submit"][value="Cancel"] {
+#endpoint-modal input[type="submit"][value="Cancel"] {
   margin-right: 20px;
 }

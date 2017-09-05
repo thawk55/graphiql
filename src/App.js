@@ -64,8 +64,8 @@ class UrlEditDialog extends React.Component {
   onSave = () => {
     const { action, onAdd, onEdit } = this.props;
     const url = {
-      name: this.refs.backendName.value,
-      url: this.refs.backendUrl.value,
+      name: this.refs.endpointName.value,
+      url: this.refs.endpointUrl.value,
       authHeader: this.refs.authHeader.value,
       authValue: this.refs.authValue.value,
     };
@@ -83,7 +83,7 @@ class UrlEditDialog extends React.Component {
   };
 
   confirmDelete = () => {
-    if (confirm('Delete this backend configuration?')) {
+    if (confirm('Delete this endpoint configuration?')) {
       this.onDelete();
     }
   };
@@ -122,24 +122,24 @@ class UrlEditDialog extends React.Component {
 
     return (
       <Modal style={styles.modal} backdropStyle={styles.backdrop} show={!!action} onHide={onHide}>
-        <div id="backend-modal" style={styles.dialog}>
-          <h4>{`${adding ? 'New ' : ''} Backend Settings`}</h4>
+        <div id="endpoint-modal" style={styles.dialog}>
+          <h4>{`${adding ? 'New ' : ''} Endpoint Settings`}</h4>
           <div>
-            <label htmlFor="backend-name">Name</label>
+            <label htmlFor="endpoint-name">Name</label>
             <input
               type="text"
-              id="backend-name"
-              ref="backendName"
+              id="endpoint-name"
+              ref="endpointName"
               defaultValue={url.name}
             />
           </div>
           <div>
-            <label htmlFor="backend-url">URL</label>
+            <label htmlFor="endpoint-url">URL</label>
             <input
               type="text"
-              id="backend-url"
+              id="endpoint-url"
               placeholder="https://{{host}/graphql"
-              ref="backendUrl"
+              ref="endpointUrl"
               defaultValue={url.url}
             />
           </div>
@@ -181,7 +181,7 @@ class App extends Component {
       showToken: false,
       urls,
       currentUrl,
-      showBackendModal: false,
+      showEndpointModal: false,
     };
   }
 
@@ -191,47 +191,47 @@ class App extends Component {
     this.setState({ currentUrl });
   }
 
-  showBackendModal = (event) => {
+  showEndpointModal = (event) => {
     const action = event.target.dataset['action'];
-    this.setState({ showBackendModal: action });
+    this.setState({ showEndpointModal: action });
   }
 
-  closeBackendModal = () => {
-    this.setState({ showBackendModal: false })
+  closeEndpointModal = () => {
+    this.setState({ showEndpointModal: false })
   }
 
-  addBackendUrl = (url) => {
+  addEndpointUrl = (url) => {
     const urls = [...this.state.urls, url];
     setLocalStorageUrls(urls);
     setLocalStorageCurrentUrlName(url.name);
     this.setState({
       urls: urls,
       currentUrl: url,
-      showBackendModal: false,
+      showEndpointModal: false,
     });
   }
 
-  editBackendUrl = (url) => {
+  editEndpointUrl = (url) => {
     const urls = this.state.urls;
     let currentUrl = _.find(this.state.urls, this.state.currentUrl);
     _.assign(currentUrl, url);
     setLocalStorageUrls(urls);
     setLocalStorageCurrentUrlName(currentUrl.name);
     this.setState({
-      showBackendModal: false,
+      showEndpointModal: false,
       urls,
       currentUrl,
     });
   }
 
-  deleteBackendUrl = (url) => {
+  deleteEndpointUrl = (url) => {
     let urls = _.filter(this.state.urls, (_url) => _url !== url);
     if (_.size(urls) === 0) {
       urls = URLS;
     }
     const currentUrl = urls[0];
     this.setState({
-      showBackendModal: false,
+      showEndpointModal: false,
       urls,
       currentUrl,
     });
@@ -289,24 +289,24 @@ class App extends Component {
         <GraphiQL.Logo />
         <GraphiQL.Toolbar>
           <div className="settings">
-            <label htmlFor="backend">Backend</label>
-            <select id="backend" value={this.state.currentUrl.name} onChange={this.setFetchUrl}>
-              {_.map(this.state.urls, (backend, idx) => (
-                <option key={backend.name + idx} value={backend.name}>{backend.name}</option>
+            <label htmlFor="endpoint">Endpoint</label>
+            <select id="endpoint" value={this.state.currentUrl.name} onChange={this.setFetchUrl}>
+              {_.map(this.state.urls, (endpoint, idx) => (
+                <option key={endpoint.name + idx} value={endpoint.name}>{endpoint.name}</option>
               ))}
             </select>
-            <img src="/edit.png" alt="Edit Backend URL" data-action="edit" onClick={this.showBackendModal} />
-            <img src="/plus.png" alt="Add Backend URL" data-action="add" onClick={this.showBackendModal} />
+            <img src="/edit.png" alt="Edit Endpoint URL" data-action="edit" onClick={this.showEndpointModal} />
+            <img src="/plus.png" alt="Add Endpoint URL" data-action="add" onClick={this.showEndpointModal} />
           </div>
           <div className="toolbar-right">
             <a className="toolbar-button" onClick={this.downloadSchema}>Download Schema</a>
           </div>
           <UrlEditDialog
-            action={this.state.showBackendModal}
-            onHide={this.closeBackendModal}
-            onAdd={this.addBackendUrl}
-            onEdit={this.editBackendUrl}
-            onDelete={this.deleteBackendUrl}
+            action={this.state.showEndpointModal}
+            onHide={this.closeEndpointModal}
+            onAdd={this.addEndpointUrl}
+            onEdit={this.editEndpointUrl}
+            onDelete={this.deleteEndpointUrl}
             currentUrl={this.state.currentUrl}
           />
         </GraphiQL.Toolbar>
