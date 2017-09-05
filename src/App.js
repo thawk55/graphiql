@@ -5,8 +5,6 @@ import { Modal } from 'react-overlays';
 import 'whatwg-fetch';
 
 const URLS = [
-  { name: "Staging", url: "https://backend-staging.divvypay.com/graphql" },
-  { name: "Dev", url: "https://backend-dev.divvypay.com/graphql" },
 ];
 
 class DivvyGraphiQL extends GraphiQL {
@@ -287,9 +285,7 @@ class App extends Component {
 
     return (
       <DivvyGraphiQL fetcher={fetcher}>
-        <GraphiQL.Logo>
-          <img src="/logo.png" alt="Divvy Logo" style={{width: '30px'}} />
-        </GraphiQL.Logo>
+        <GraphiQL.Logo />
         <GraphiQL.Toolbar>
           <div className="settings">
             <label htmlFor="backend">Backend</label>
