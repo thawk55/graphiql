@@ -9,7 +9,12 @@ To run:
 * `npm install`
 * `npm start` or `PORT=<port> npm start`
 
-This should open the app in a browser tab. The default port is 5000.
+This should open the app in a browser tab. The default port is 3000. To set a different
+default port, create an `.env` file in the project folder that contains the following line:
+
+```bash
+PORT=<port>
+```
 
 ## Developing
 
