@@ -1,7 +1,7 @@
 # GraphiQL Query Browser
 
 A customization of [GraphiQL](https://github.com/graphql/graphiql) that supports multiple endpoint 
-definitions and Authorization headers.
+definitions that can each include an Authorization header.
 
 ## Using
 
