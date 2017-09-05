@@ -1,7 +1,7 @@
-# Divvy GraphiQL Query Browser
+# GraphiQL Query Browser
 
-A customized instance of GraphiQL that allows use to easily choose a
-backend and specify a bearer token to use.
+A customization of [GraphiQL](https://github.com/graphql/graphiql) that supports multiple endpoint 
+definitions and Authorization headers.
 
 ## Using
 
@@ -9,7 +9,7 @@ To run:
 * `npm install`
 * `npm start` or `PORT=<port> npm start`
 
-This should open the app in a browser tab. The default port is 3000.
+This should open the app in a browser tab. The default port is 5000.
 
 ## Developing
 
