@@ -279,6 +279,7 @@ class App extends Component {
       method: 'post',
       headers: {
         'Content-Type': "application/json",
+        'X-API-Version': '1',
         ...this.authHeaders(),
       },
       body: JSON.stringify(params),
