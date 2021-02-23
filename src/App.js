@@ -69,6 +69,7 @@ class UrlEditDialog extends React.Component {
       authHeader: this.refs.authHeader.value,
       authValue: this.refs.authValue.value,
       apiVersion: this.refs.apiVersion.value,
+      actingOnCompany: this.refs.actingOnCompany.value,
     };
     if (url.name && url.url) {
       if (action === 'add') {
@@ -168,6 +169,14 @@ class UrlEditDialog extends React.Component {
               defaultValue={url.apiVersion}
               placeholder="2"
             />
+            <label htmlFor="acting-on-company">Acting on Company</label>
+            <input
+              type="text"
+              id="acting-on-company"
+              ref="actingOnCompany"
+              defaultValue={url.actingOnCompany}
+              placeholder=""
+            />
           </div>
           <input type="submit" onClick={this.onSave} value="Save" />
           <input type="submit" onClick={onHide} value="Cancel" />
@@ -251,10 +260,12 @@ class App extends Component {
     let authHeader = _.get(this, 'state.currentUrl.authHeader');
     let authValue = _.get(this, 'state.currentUrl.authValue');
     let apiVersion = _.get(this, 'state.currentUrl.apiVersion');
+    let actingOnCompany = _.get(this, 'state.currentUrl.actingOnCompany');
     if (authHeader) {
       headers[authHeader] = authValue;
     }
     headers['X-API-Version'] = apiVersion || '2';
+    headers['x-acting-on-company'] = actingOnCompany;
 
     return headers;
   };
